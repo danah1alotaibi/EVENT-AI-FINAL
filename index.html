@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EventAI — منظم المناسبات الذكي</title>
+  <style>
+    :root{
+      --bg-1:#0d1020;
+      --bg-2:#171a35;
+      --bg-3:#2a1c4a;
+      --glass:rgba(255,255,255,.10);
+      --glass-2:rgba(255,255,255,.06);
+      --stroke:rgba(255,255,255,.14);
+      --text:#f8f7ff;
+      --muted:#d4d1e4;
+      --cyan:#67e8f9;
+      --violet:#a78bfa;
+      --pink:#f9a8d4;
+      --ok:#86efac;
+      --danger:#fda4af;
+      --shadow:0 24px 70px rgba(0,0,0,.30);
+      --radius:28px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 10% 18%, rgba(103,232,249,.16), transparent 26%),
+        radial-gradient(circle at 90% 10%, rgba(249,168,212,.15), transparent 22%),
+        radial-gradient(circle at 72% 85%, rgba(167,139,250,.20), transparent 28%),
+        linear-gradient(135deg,var(--bg-1),var(--bg-2) 48%,var(--bg-3));
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      max-width:1180px;
+      margin:0 auto;
+      padding:26px 18px 70px;
+      position:relative;
+      z-index:2;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:24px;
+      min-height:58px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:25px;
+      font-weight:900;
+    }
+
+    .logo{
+      width:52px;
+      height:52px;
+      border-radius:17px;
+      display:grid;
+      place-items:center;
+      font-size:24px;
+      color:#111427;
+      background:linear-gradient(135deg,var(--cyan),var(--violet),var(--pink));
+      box-shadow:0 14px 36px rgba(103,232,249,.14);
+    }
+
+    .top-pill{
+      padding:9px 13px;
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      color:var(--muted);
+      background:rgba(255,255,255,.06);
+      backdrop-filter:blur(12px);
+      font-size:13px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+      gap:24px;
+      align-items:stretch;
+    }
+
+    .glass{
+      background:linear-gradient(180deg,var(--glass),var(--glass-2));
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(18px);
+    }
+
+    .intro{
+      padding:36px;
+      min-height:620px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .intro::before,
+    .intro::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      filter:blur(34px);
+      pointer-events:none;
+      opacity:.26;
+    }
+
+    .intro::before{
+      width:180px;
+      height:180px;
+      background:var(--violet);
+      top:-55px;
+      left:-45px;
+    }
+
+    .intro::after{
+      width:160px;
+      height:160px;
+      background:var(--cyan);
+      bottom:-50px;
+      right:-45px;
+    }
+
+    .eyebrow{
+      width:max-content;
+      max-width:100%;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 13px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.07);
+      color:#f5dcff;
+      font-weight:800;
+      margin-bottom:18px;
+      position:relative;
+      z-index:1;
+    }
+
+    h1{
+      margin:0 0 18px;
+      font-size:clamp(42px,5vw,66px);
+      line-height:1.08;
+      letter-spacing:-1px;
+      max-width:650px;
+      position:relative;
+      z-index:1;
+    }
+
+    .lead{
+      margin:0;
+      color:var(--muted);
+      font-size:17px;
+      line-height:1.95;
+      max-width:650px;
+      position:relative;
+      z-index:1;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:9px;
+      margin-top:24px;
+      position:relative;
+      z-index:1;
+    }
+
+    .chip{
+      padding:9px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.11);
+      font-size:13px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .steps{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+      margin-top:28px;
+      position:relative;
+      z-index:1;
+    }
+
+    .step{
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      min-height:118px;
+    }
+
+    .step strong{
+      display:block;
+      font-size:22px;
+      margin-bottom:7px;
+    }
+
+    .step span{
+      display:block;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.65;
+    }
+
+    .panel{
+      padding:28px;
+    }
+
+    .panel h2{
+      margin:0 0 8px;
+      font-size:30px;
+      line-height:1.3;
+    }
+
+    .sub{
+      color:var(--muted);
+      margin:0 0 22px;
+      line-height:1.75;
+      font-size:14px;
+    }
+
+    form{display:grid;gap:15px}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:13px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:7px;
+      font-size:14px;
+      font-weight:800;
+    }
+
+    input,select{
+      width:100%;
+      min-width:0;
+      padding:14px 15px;
+      border-radius:15px;
+      border:1px solid rgba(255,255,255,.15);
+      background:rgba(255,255,255,.09);
+      color:#fff;
+      font-size:15px;
+      outline:none;
+      transition:.2s ease;
+    }
+
+    input::placeholder{color:#d0cce0}
+    select option{color:#171426}
+
+    input:focus,select:focus{
+      border-color:rgba(103,232,249,.75);
+      box-shadow:0 0 0 4px rgba(103,232,249,.10);
+    }
+
+    .citybox{
+      padding:14px 15px;
+      border-radius:15px;
+      border:1px dashed rgba(255,255,255,.22);
+      background:rgba(255,255,255,.07);
+      font-weight:800;
+    }
+
+    .btn{
+      border:0;
+      border-radius:16px;
+      padding:15px 18px;
+      font-size:15px;
+      font-weight:900;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg,var(--cyan),var(--violet),var(--pink));
+      color:#151125;
+      box-shadow:0 14px 34px rgba(167,139,250,.20);
+    }
+
+    .btn-primary:hover{transform:translateY(-1px)}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+    .loading{
+      display:none;
+      align-items:center;
+      gap:9px;
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
+    }
+
+    .loading.show{display:flex}
+
+    .spinner{
+      width:17px;
+      height:17px;
+      border:3px solid rgba(255,255,255,.16);
+      border-top-color:var(--cyan);
+      border-radius:50%;
+      animation:spin .8s linear infinite;
+    }
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .note{
+      margin-top:17px;
+      padding-top:15px;
+      border-top:1px solid rgba(255,255,255,.09);
+      color:#c9c5d8;
+      font-size:12px;
+      line-height:1.75;
+    }
+
+    .hidden{display:none}
+
+    .result{
+      display:none;
+      margin-top:24px;
+      padding:28px;
+    }
+
+    .result.show{display:block}
+
+    .result h2{
+      margin:0 0 8px;
+      font-size:30px;
+    }
+
+    .result pre{
+      margin:16px 0 0;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-family:inherit;
+      line-height:1.95;
+      font-size:15px;
+      padding:20px;
+      border-radius:18px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.11);
+      color:#fff;
+      overflow:auto;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:11px;
+      margin-top:17px;
+    }
+
+    .approve,.reject{
+      border-radius:15px;
+      padding:13px 17px;
+      font-weight:900;
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.13);
+      color:#fff;
+    }
+
+    .approve{background:rgba(134,239,172,.13)}
+    .reject{background:rgba(253,164,175,.12)}
+
+    .status{
+      display:none;
+      margin-top:13px;
+      padding:13px 15px;
+      border-radius:15px;
+      font-weight:800;
+    }
+
+    .status.show{display:block}
+    .status.ok{
+      color:#dcffe7;
+      background:rgba(134,239,172,.12);
+      border:1px solid rgba(134,239,172,.18);
+    }
+    .status.no{
+      color:#ffe5e9;
+      background:rgba(253,164,175,.11);
+      border:1px solid rgba(253,164,175,.18);
+    }
+
+    @media(max-width:1080px){
+      .hero{
+        grid-template-columns:1fr;
+      }
+      .intro{
+        min-height:auto;
+      }
+    }
+
+    @media(max-width:700px){
+      .topbar{
+        align-items:flex-start;
+      }
+      .grid,.steps{
+        grid-template-columns:1fr;
+      }
+      .intro,.panel,.result{
+        padding:22px;
+      }
+      h1{
+        font-size:42px;
+      }
+      .top-pill{
+        display:none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="wrap">
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">✦</div>
+        <div>EventAI</div>
+      </div>
+      <div class="top-pill">Creative AI Event Planner</div>
+    </div>
+
+    <section class="hero">
+
+      <article class="intro glass">
+        <div class="eyebrow">منصة ذكية للمناسبات الخاصة ✨</div>
+
+        <h1>خلي مناسبتك<br>تطلع بشكل<br>يبهر الجميع.</h1>
+
+        <p class="lead">
+          EventAI يساعدك في بناء خطة مناسبة متكاملة لأي مناسبة خاصة:
+          يختار الموردين المناسبين، يراعي الميزانية وعدد الضيوف والستايل،
+          ويعرض عليك تصورًا واضحًا قبل اعتماد الخطة.
+        </p>
+
+        <div class="chips">
+          <div class="chip">🎓 تخرج</div>
+          <div class="chip">🎂 عيد ميلاد</div>
+          <div class="chip">💍 خطوبة</div>
+          <div class="chip">👶 استقبال مولود</div>
+          <div class="chip">🏢 فعالية خاصة</div>
+          <div class="chip">🎉 مناسبة عائلية</div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <strong>01</strong>
+            <span>أدخلي تفاصيل المناسبة والميزانية والستايل المطلوب.</span>
+          </div>
+          <div class="step">
+            <strong>02</strong>
+            <span>EventAI يبحث عن الموردين المناسبين ويحسب التكلفة.</span>
+          </div>
+          <div class="step">
+            <strong>03</strong>
+            <span>راجعي الخطة واعتمديها أو عدّليها قبل التنفيذ.</span>
+          </div>
+        </div>
+      </article>
+
+      <section class="panel glass">
+        <h2>ابني خطة مناسبتك</h2>
+        <p class="sub">النسخة التجريبية الحالية مخصصة لمدينة جدة ومتصلة بـ EventAI Agent.</p>
+
+        <form id="eventForm">
+
+          <div>
+            <label for="event_type">نوع المناسبة</label>
+            <select id="event_type" required>
+              <option value="">اختاري نوع المناسبة</option>
+              <option value="تخرج">تخرج</option>
+              <option value="عيد ميلاد">عيد ميلاد</option>
+              <option value="خطوبة">خطوبة</option>
+              <option value="استقبال مولود">استقبال مولود</option>
+              <option value="حفل عائلي">حفل عائلي</option>
+              <option value="فعالية خاصة">فعالية خاصة</option>
+              <option value="أخرى">أخرى</option>
+            </select>
+          </div>
+
+          <div id="customOccasionWrap" class="hidden">
+            <label for="custom_occasion">اكتبي نوع المناسبة</label>
+            <input id="custom_occasion" type="text" placeholder="مثال: حفل تكريم">
+          </div>
+
+          <div>
+            <label>المدينة</label>
+            <div class="citybox">جدة</div>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label for="budget">الميزانية بالريال</label>
+              <input id="budget" type="number" min="1000" step="500" placeholder="مثال: 50000" required>
+            </div>
+
+            <div>
+              <label for="guests">عدد الضيوف</label>
+              <input id="guests" type="number" min="1" step="1" placeholder="مثال: 150" required>
+            </div>
+          </div>
+
+          <div>
+            <label for="event_date">تاريخ المناسبة</label>
+            <input id="event_date" type="date" required>
+          </div>
+
+          <div>
+            <label for="style">الستايل المطلوب</label>
+            <select id="style" required>
+              <option value="">اختاري الستايل</option>
+              <option value="مودرن">مودرن</option>
+              <option value="كلاسيك">كلاسيك</option>
+              <option value="فاخر">فاخر</option>
+              <option value="بسيط">بسيط</option>
+              <option value="مرح">مرح</option>
+              <option value="رسمي">رسمي</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" id="submitBtn" type="submit">
+            ✨ أنشئي خطة EventAI
+          </button>
+
+          <div class="loading" id="loading">
+            <span class="spinner"></span>
+            جاري بناء الخطة...
+          </div>
+
+        </form>
+
+        <div class="note">
+          ضعي رابط الـ Production Webhook الخاص بـ n8n داخل
+          <b>PLAN_WEBHOOK_URL</b> في أسفل الملف.
+        </div>
+      </section>
+    </section>
+
+    <section class="result glass" id="resultBox">
+      <div class="eyebrow">الخطة المقترحة</div>
+      <h2>خطة EventAI ✨</h2>
+      <pre id="planText"></pre>
+
+      <div class="actions">
+        <button class="approve" id="approveBtn" type="button">✅ اعتماد الخطة</button>
+        <button class="reject" id="rejectBtn" type="button">✏️ غير موافقة</button>
+      </div>
+
+      <div class="status" id="statusBox"></div>
+    </section>
+
+  </main>
+
+  <script>
+    // ضعي هنا رابط Production Webhook من n8n
+    const PLAN_WEBHOOK_URL = "PASTE_YOUR_N8N_PLAN_WEBHOOK_URL_HERE";
+
+    // اختياري لاحقًا لتسجيل الموافقة والرفض
+    const APPROVAL_WEBHOOK_URL = "";
+
+    const eventType = document.getElementById("event_type");
+    const customWrap = document.getElementById("customOccasionWrap");
+    const customOccasion = document.getElementById("custom_occasion");
+
+    eventType.addEventListener("change", () => {
+      const isOther = eventType.value === "أخرى";
+      customWrap.classList.toggle("hidden", !isOther);
+      customOccasion.required = isOther;
+    });
+
+    const form = document.getElementById("eventForm");
+    const loading = document.getElementById("loading");
+    const submitBtn = document.getElementById("submitBtn");
+    const resultBox = document.getElementById("resultBox");
+    const planText = document.getElementById("planText");
+    const statusBox = document.getElementById("statusBox");
+
+    let lastPlan = "";
+
+    function extractPlan(data) {
+      if (typeof data === "string") return data;
+      if (data?.output) return data.output;
+      if (data?.plan) return data.plan;
+      if (data?.data?.output) return data.data.output;
+      return JSON.stringify(data, null, 2);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (PLAN_WEBHOOK_URL.includes("PASTE_YOUR")) {
+        alert("أضيفي رابط Production Webhook داخل PLAN_WEBHOOK_URL أولاً.");
+        return;
+      }
+
+      const occasion =
+        eventType.value === "أخرى"
+          ? customOccasion.value.trim()
+          : eventType.value;
+
+      const date = document.getElementById("event_date").value;
+
+      const payload = {
+        city: "جدة",
+        event_type: occasion,
+        budget: Number(document.getElementById("budget").value),
+        guests: Number(document.getElementById("guests").value),
+
+        // للتوافق مع الـ Workflow الحالي
+        wedding_date: date,
+        event_date: date,
+
+        style: document.getElementById("style").value
+      };
+
+      loading.classList.add("show");
+      submitBtn.disabled = true;
+      statusBox.className = "status";
+      resultBox.classList.remove("show");
+
+      try {
+        const res = await fetch(PLAN_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const contentType = res.headers.get("content-type") || "";
+
+        const data = contentType.includes("application/json")
+          ? await res.json()
+          : await res.text();
+
+        if (!res.ok) {
+          throw new Error(extractPlan(data));
+        }
+
+        lastPlan = extractPlan(data);
+        planText.textContent = lastPlan;
+
+        resultBox.classList.add("show");
+        resultBox.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+
+      } catch (err) {
+        alert("تعذر إنشاء الخطة.\n\n" + (err?.message || err));
+      } finally {
+        loading.classList.remove("show");
+        submitBtn.disabled = false;
+      }
+    });
+
+    async function sendApproval(approval) {
+      statusBox.className = "status show";
+
+      statusBox.textContent =
+        approval === "موافق"
+          ? "تم اعتماد الخطة ✅"
+          : "لم يتم اعتماد الخطة. يمكنك تعديل البيانات وتجربة خطة أخرى.";
+
+      statusBox.classList.add(
+        approval === "موافق" ? "ok" : "no"
+      );
+
+      if (!APPROVAL_WEBHOOK_URL) return;
+
+      try {
+        await fetch(APPROVAL_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            approval,
+            event_type: eventType.value,
+            plan: lastPlan,
+            timestamp: new Date().toISOString()
+          })
+        });
+      } catch(e) {
+        console.warn("Approval webhook failed:", e);
+      }
+    }
+
+    document
+      .getElementById("approveBtn")
+      .addEventListener("click", () => sendApproval("موافق"));
+
+    document
+      .getElementById("rejectBtn")
+      .addEventListener("click", () => sendApproval("غير موافق"));
+  </script>
+
+</body>
+</html>
